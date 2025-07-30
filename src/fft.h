@@ -1,8 +1,21 @@
-int add_8_8_fixed(int a, int b);
-int subtract_8_8_fixed(int a, int b);
-int multiply_8_8_fixed(int a, int b);
-int divide_8_8_fixed(int a, int b);
+#ifndef FFT_H
+#define FFT_H
+
+#include <stdint.h>
+
+#define FRACTIONAL_BITS 10
+
+typedef int32_t fix32_10;
+
+fix32_10 int32_to_fix32_10 (int32_t a);
+int32_t fix32_10_to_int32 (fix32_10 a);
+
+fix32_10 add_fix32_10(fix32_10 a, fix32_10 b);
+fix32_10 subtract_fix32_10(fix32_10 a, fix32_10 b);
+fix32_10 multiply_fix32_10(fix32_10 a, fix32_10 b);
 
 int process_fft (int *samples, int *fft_bins, int num_samples);
 
 int test_arithmetic();
+
+#endif

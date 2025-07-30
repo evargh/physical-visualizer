@@ -25,10 +25,9 @@ $(BUILD_DIR):
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 	avr-gcc $(CFLAGS) -c $< -o $@
 
-# Link executable
+# Link executable and generate annotated assembly for my own study
 $(TARGET): $(OBJS)
 	avr-gcc $(LDFLAGS) -o $@ $^
-	# Generate annotated assembly for my own study
 	avr-objdump -d -S $@ > $(basename $@).lst
 	avr-objcopy -O ihex -R .eeprom $(TARGET) $(basename $@).hex
 
