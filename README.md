@@ -1,6 +1,6 @@
 The goal is to implement a fast, embedded music visualizer on an ESP32 using first principles (without looking anything up, other than the DFT math), and then benchmark that against a more informed approach in a separate branch.
 
-Due to a few basics being missed with the ATMEGA328P (namely the internal conversion time taking 13 ADC cycles, not 13 CPU cycles, and the overhead of trying to stream data at any higher rate into a software buffer), I'm moving to an ESP32.
+Due to a few basics being missed with the ATMEGA328P (namely the internal conversion time taking 13 ADC cycles, not 13 CPU cycles, and the overhead of trying to stream data at any higher rate into a software buffer using SPI to emulate I2S on a device that's also doing an FFT), I'm moving to an ESP32.
 
 # Blocks
 
