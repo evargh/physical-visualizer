@@ -4,18 +4,27 @@
 #include <stdint.h>
 
 #define FRACTIONAL_BITS 10
+#define SAMPLE_BUFFER_SIZE 1024
 
 typedef int32_t fix32_10;
 
-fix32_10 int32_to_fix32_10 (int32_t a);
-int32_t fix32_10_to_int32 (fix32_10 a);
+fix32_10 int32_to_fix32_10(int32_t a);
+int32_t fix32_10_to_int32(fix32_10 a);
 
 fix32_10 add_fix32_10(fix32_10 a, fix32_10 b);
 fix32_10 subtract_fix32_10(fix32_10 a, fix32_10 b);
 fix32_10 multiply_fix32_10(fix32_10 a, fix32_10 b);
 
-int process_fft (int *samples, int *fft_bins, int num_samples);
+uint16_t populate_sample_buffer(int32_t a, uint16_t pointer);
+
+int process_fft(int *samples, int *fft_bins, int num_samples);
 
 int test_arithmetic();
+
+// circular buffer to quickly store entries
+extern fix32_10 sample_values_fix32_10_circular[SAMPLE_BUFFER_SIZE];
+
+extern fix32_10 complex_frequency_real[SAMPLE_BUFFER_SIZE];
+extern fix32_10 complex_frequency_imaginary[SAMPLE_BUFFER_SIZE];
 
 #endif

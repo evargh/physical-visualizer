@@ -1,6 +1,6 @@
+#include "fft.h"
 #include <avr/io.h>
 #include <util/delay.h>
-#include "fft.h"
 
 #define BLINK_DELAY_MS 100
 #define F_CPU 16000000UL
