@@ -15,6 +15,12 @@ int main(void) {
     PORTB |= _BV(PORTB5);
     _delay_ms(BLINK_DELAY_MS);
 
+    if (process_flag) {
+	process_flag = 0;
+	
+        fix32_10 complex_frequency_real[SAMPLE_BUFFER_SIZE];
+        fix32_10 complex_frequency_imaginary[SAMPLE_BUFFER_SIZE];
+    }
     /* set pin 5 low to turn led off */
     PORTB &= ~_BV(PORTB5);
     _delay_ms(BLINK_DELAY_MS);

@@ -7,6 +7,24 @@
 
 #include "fft.h"
 #include <assert.h>
+#include <avr/interrupt.h>
+
+volatile fix32_10 sample_values_fix32_10_circular[SAMPLE_BUFFER_SIZE];
+uint16_t sample_values_pointer = 0;
+volatile int process_flag = 0;
+
+ISR(ADC_vect)
+{   
+  int32_t data = ((int32_t)ADCH << 16) + (int32_t)ADCL;
+ 
+  sample_values_fix32_10_circular[sample_values_pointer] = int32_to_fix32_10(data);
+  if (sample_values_pointer == SAMPLE_BUFFER_SIZE) {
+    sample_values_pointer =  0;
+    process_flag = 1;
+  } else {
+    sample_values_pointer += 1;
+  }
+}
 
 fix32_10 int32_to_fix32_10(int32_t a) {
   // check for overflow - the upper FRACTIONAL_BITS bits should be all 0 or all
@@ -36,17 +54,8 @@ fix32_10 multiply_fix32_10(fix32_10 a, fix32_10 b) {
   return (int32_t)product;
 }
 
-uint16_t populate_sample_buffer(int32_t a, uint16_t pointer) {
-  sample_values_fix32_10_circular[pointer] = int32_to_fix32_10(a);
-  if (pointer == SAMPLE_BUFFER_SIZE) {
-    return 0;
-  } else {
-    return pointer + 1;
-  }
-}
-
 // the signal being tested is an audio signal with sample rate, say, 44.1 kHz
-int process_fft(int *samples, int *fft_bins, int num_samples) {
+int process_fft(int *fft_bins, int num_samples) {
   // do the math for this
   return 0;
 }
