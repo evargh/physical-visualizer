@@ -1,0 +1,16 @@
+#ifndef PHYSICAL_VISUALIZER_PIN_CONFIG
+#define PHYSICAL_VISUALIZER_PIN_CONFIG
+
+
+/* I2S Pins */
+#define I2S_BLK_PIN GPIO_NUM_4
+#define I2S_IN_PIN GPIO_NUM_18
+// Also called WS
+#define I2S_LRC_PIN GPIO_NUM_5
+#define I2S_MCLK_PIN GPIO_NUM_1
+
+/* UART Pins */
+#define UART1_TX GPIO_NUM_17
+#define UART1_RX GPIO_NUM_16
+
+#endif
