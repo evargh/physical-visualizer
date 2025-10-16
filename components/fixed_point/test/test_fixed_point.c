@@ -37,6 +37,106 @@ TEST_CASE("Round-trip conversion of -2", "[fixed_point]")
     TEST_ASSERT_EQUAL_INT(-2, result);
 }
 
+TEST_CASE("Extract fractional component of 0.75", "[fixed_point]")
+{
+    fix32_10 decimal = 768; // 0.75 * 1024
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "7500000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of 0.0", "[fixed_point]")
+{
+    fix32_10 decimal = 0;
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "0000000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of 1.0", "[fixed_point]")
+{
+    fix32_10 decimal = 1024; // 1.0 in Q22.10
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "0000000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of 0.5", "[fixed_point]")
+{
+    fix32_10 decimal = 512;
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "5000000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of max fractional value", "[fixed_point]")
+{
+    fix32_10 decimal = 1023; // Just below 1.0
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "9990234375"; // 1023 * 9765625
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of -0.25", "[fixed_point]")
+{
+    fix32_10 decimal = -256;
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "2500000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of -1.0", "[fixed_point]")
+{
+    fix32_10 decimal = -1024;
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "0000000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of -0.999", "[fixed_point]")
+{
+    fix32_10 decimal = -1023; // Almost -1.0
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "9990234375"; 
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of large positive value", "[fixed_point]")
+{
+    fix32_10 decimal = (123 << 10) + 256; // 123.25
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "2500000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
+TEST_CASE("Extract fractional component of large negative value", "[fixed_point]")
+{
+    fix32_10 decimal = -(122 << 10) - 768; // -122.75
+    char string[FRACTIONAL_BITS+1] = "XXXXXXXXXX";
+    char correct_string[FRACTIONAL_BITS+1] = "7500000000";
+
+    fractional_fix32_10(decimal, string);
+    TEST_ASSERT_EQUAL_STRING(string, correct_string);
+}
+
 TEST_CASE("Addition: 1 + 2 == 3", "[fixed_point]")
 {
     fix32_10 result = add_fix32_10(int32_to_fix32_10(1), int32_to_fix32_10(2));
@@ -49,13 +149,13 @@ TEST_CASE("Addition: -1 + 2 == 1", "[fixed_point]")
     TEST_ASSERT_EQUAL_INT(int32_to_fix32_10(1), result);
 }
 
-TEST_CASE("Multiplication: 1024 * 1024 == 1024", "[fixed_point]")
+TEST_CASE("Multiplication: 1 * 1 == 1", "[fixed_point]")
 {
     fix32_10 result = multiply_fix32_10(1024, 1024);
     TEST_ASSERT_EQUAL_INT(1024, result);
 }
 
-TEST_CASE("Multiplication: 1024 * -1024 == -1024", "[fixed_point]")
+TEST_CASE("Multiplication: 1 * -1 == -1", "[fixed_point]")
 {
     fix32_10 result = multiply_fix32_10(1024, -1024);
     TEST_ASSERT_EQUAL_INT(-1024, result);
@@ -131,6 +231,14 @@ TEST_CASE("Multiplication: -2 * -3 == 6", "[fixed_point]")
 {
     fix32_10 result = multiply_fix32_10(int32_to_fix32_10(-2), int32_to_fix32_10(-3));
     TEST_ASSERT_EQUAL_INT(int32_to_fix32_10(6), result);
+}
+
+TEST_CASE("Decimal Operations", "[fixed_point]")
+{
+
+    fix32_10 decimal_1 = -(123 << 10) + 256; // -122.75
+    fix32_10 decimal_2 = -(122 << 10) - 768; // -122.75
+    TEST_ASSERT_EQUAL_INT(decimal_1, decimal_2);
 }
 
 /*******

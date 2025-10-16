@@ -2,7 +2,7 @@
 #include <string.h>
 #include "unity.h"
 #include "freertos/FreeRTOS.h"
-
+#include "esp_log.h"
 
 static void print_banner(const char* text);
 
@@ -14,6 +14,7 @@ void app_main(void)
      * UNITY_BEGIN() and UNITY_END() calls tell Unity to print a summary
      * (number of tests executed/failed/ignored) of tests executed between these calls.
      */
+    esp_log_level_set("*", ESP_LOG_INFO);
     print_banner("Running all the registered tests");
     UNITY_BEGIN();
     unity_run_all_tests();

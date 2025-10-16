@@ -25,18 +25,33 @@ int32_t fix32_10_to_int32(fix32_10 a) {
   }
 }
 
+void fractional_fix32_10(fix32_10 a, char string[FRACTIONAL_BITS+1]) {
+	// to turn this into a whole number, return the decimal number of the fractional part multiplied with 2**(-10) i.e. 9765625. There are 10 digits in the decimal part maximum, so add leading zeroes as necessary
+    uint32_t mask = (1 << FRACTIONAL_BITS) - 1;
+    uint32_t fractional_part = abs(a) & mask;
+    int64_t fractional_value = (int64_t)fractional_part * 9765625;
+
+    snprintf(string, FRACTIONAL_BITS+1, "%010lld", fractional_value);
+}
+
 // carry functions regardless of the decimal
 fix32_10 add_fix32_10(fix32_10 a, fix32_10 b) { 
 	int64_t sum = (int64_t)a + (int64_t)b;
-	assert(sum < (1 << 31) - 1 && sum > -(1 << 31));
+	if(!(sum < (1 << 31) - 1 && sum > -(1 << 31))) {
+		printf("sum failure, %ld %ld\n", (int32_t)a, (int32_t)b);
+		assert(sum < (1 << 31) - 1 && sum > -(1 << 31));
+	}
 	return (int32_t)sum; 
 }
 
 // carry functions regardless of the decimal
 fix32_10 subtract_fix32_10(fix32_10 a, fix32_10 b) {
-	int64_t subtraction = (int64_t)a - (int64_t)b;
-	assert(subtraction < (1 << 31) - 1 && subtraction > -(1 << 31));
-	return (int32_t)subtraction; 
+	int64_t sum = (int64_t)a - (int64_t)b;
+	if(!(sum < (1 << 31) - 1 && sum > -(1 << 31))) {
+		printf("subtraction failure, %ld %ld\n", (int32_t)a, (int32_t)b);
+		assert(sum < (1 << 31) - 1 && sum > -(1 << 31));
+	}
+	return (int32_t)sum; 
 }
 
 // multiplying these two numbers would require 64 bits, a top 44 to represent

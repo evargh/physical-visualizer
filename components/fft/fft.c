@@ -8,6 +8,7 @@
 
 #include "esp_err.h"
 #include "esp_system.h"
+#include "fixed_point.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "sdkconfig.h"
@@ -21,7 +22,7 @@
 // https://graphics.stanford.edu/~seander/bithacks.html#BitReverseObvious
 uint32_t reverse_bits(const struct FFT_Params *params, uint32_t v) {
   unsigned int r = v; // r will be reversed bits of v; first get LSB of v
-  int s = params->fft_size_bits - 1;   // extra shift needed at end
+  int s = params->fft_size_bits - 1; // extra shift needed at end
 
   for (v >>= 1; v; v >>= 1) // shift v down until it's not zero
   {
@@ -31,8 +32,8 @@ uint32_t reverse_bits(const struct FFT_Params *params, uint32_t v) {
   }
   r <<= s; // shift when v's highest bits are zero. e.g. if v had 4 non-zero
            // bits, those would be the top 4 non-zero bits of r
-	
-  r &= (1 << params->fft_size_bits) - 1;	// bitmask
+
+  r &= (1 << params->fft_size_bits) - 1; // bitmask
   return r;
 }
 
@@ -74,23 +75,37 @@ int generate_result_freqs(const struct FFT_Params *params,
 
   // this algorithm performs the stages of a log(N) stage FFT in-place
   for (size_t s = 1; s <= fft_size_log2; s++) {
-    size_t m = 2 * s;
+    size_t m = 1 << s;
     size_t twiddle_index = fft_size / m;
     for (size_t k = 0; k < fft_size; k += m) {
       for (size_t j = 0; j < m / 2; j++) {
+	size_t even_index = k + j;
+	size_t odd_index = k + j + m/2;
         // intuitively, this follows the logic of "even + twiddle * odd"
-        struct fix32_10_Complex even = result_freqs[(k + j)];
-        struct fix32_10_Complex odd = result_freqs[(k + j) + m / 2];
+        
+	struct fix32_10_Complex even = result_freqs[even_index];
+        struct fix32_10_Complex odd = result_freqs[odd_index];
 
-        result_freqs[k + j] = add_fix32_10_complex(
-            even,
-            multiply_fix32_10_complex(
-                complex_twiddles[(twiddle_index * (k + j)) % fft_size], odd));
-        result_freqs[k + j + m / 2] = add_fix32_10_complex(
-            even, multiply_fix32_10_complex(
-                      complex_twiddles[(twiddle_index * ((k + j) + m / 2)) %
-                                       fft_size],
-                      odd));
+        struct fix32_10_Complex twiddle_product = multiply_fix32_10_complex(
+            complex_twiddles[(twiddle_index * (even_index)) % fft_size], odd);
+        
+	struct fix32_10_Complex twiddle_product_complement = multiply_fix32_10_complex(
+            complex_twiddles[(twiddle_index * (odd_index)) % fft_size], odd);
+/*
+        int32_t whole_part_real = fix32_10_to_int32(twiddle_product.real);
+        char fractional_part_real[FRACTIONAL_BITS + 1];
+        fractional_fix32_10(twiddle_product.real, fractional_part_real);
+        int32_t whole_part_imag = fix32_10_to_int32(twiddle_product.imag);
+        char fractional_part_imag[FRACTIONAL_BITS + 1];
+        fractional_fix32_10(twiddle_product.imag, fractional_part_imag);
+
+        printf("%ld.%s + j%ld.%s \n", whole_part_real, fractional_part_real,
+               whole_part_imag, fractional_part_imag);
+*/
+
+        result_freqs[even_index] = add_fix32_10_complex(even, twiddle_product);
+        result_freqs[odd_index] =
+            add_fix32_10_complex(even, twiddle_product_complement);
       }
     }
   }

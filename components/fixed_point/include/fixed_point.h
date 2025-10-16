@@ -20,6 +20,8 @@ struct fix32_10_Complex {
 fix32_10 int32_to_fix32_10(int32_t a);
 int32_t fix32_10_to_int32(fix32_10 a);
 
+void fractional_fix32_10(fix32_10 a, char string[FRACTIONAL_BITS+1]);
+
 fix32_10 add_fix32_10(fix32_10 a, fix32_10 b);
 fix32_10 subtract_fix32_10(fix32_10 a, fix32_10 b);
 fix32_10 multiply_fix32_10(fix32_10 a, fix32_10 b);
