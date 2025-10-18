@@ -53,6 +53,7 @@ int bit_reverse_complex_array(const struct FFT_Params *params,
                               struct fix32_10_Complex output[]) {
   int fft_size = 1 << (params->fft_size_bits);
 
+  // 
   for (size_t i = 0; i < fft_size; i++) {
     output[i] = input[reverse_bits(params, i)];
   }
@@ -60,7 +61,7 @@ int bit_reverse_complex_array(const struct FFT_Params *params,
 }
 
 int generate_result_freqs(const struct FFT_Params *params,
-                          struct fix32_10_Complex *complex_twiddles,
+                          const struct fix32_10_Complex *complex_twiddles,
                           const fix32_10 *test_signal,
                           struct fix32_10_Complex *result_freqs) {
 
@@ -86,11 +87,14 @@ int generate_result_freqs(const struct FFT_Params *params,
 	struct fix32_10_Complex even = result_freqs[even_index];
         struct fix32_10_Complex odd = result_freqs[odd_index];
 
+	struct fix32_10_Complex even_twiddle = even_index >= (fft_size >> 1) ? multiply_fix32_10_complex((struct fix32_10_Complex){-1024, 0}, complex_twiddles[(twiddle_index * even_index) % (fft_size >> 1)]) : complex_twiddles[(twiddle_index * even_index) % (fft_size >> 1)];
+	struct fix32_10_Complex odd_twiddle = odd_index >= (fft_size >> 1) ? multiply_fix32_10_complex((struct fix32_10_Complex){-1024, 0}, complex_twiddles[(twiddle_index * odd_index) % (fft_size >> 1)]) : complex_twiddles[(twiddle_index * odd_index) % (fft_size >> 1)];
+	
         struct fix32_10_Complex twiddle_product = multiply_fix32_10_complex(
-            complex_twiddles[(twiddle_index * (even_index)) % fft_size], odd);
+            even_twiddle, odd);
         
 	struct fix32_10_Complex twiddle_product_complement = multiply_fix32_10_complex(
-            complex_twiddles[(twiddle_index * (odd_index)) % fft_size], odd);
+            odd_twiddle, odd);
 /*
         int32_t whole_part_real = fix32_10_to_int32(twiddle_product.real);
         char fractional_part_real[FRACTIONAL_BITS + 1];
