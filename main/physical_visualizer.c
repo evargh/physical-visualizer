@@ -5,7 +5,9 @@
  */
 
 #include "fft.h"
+#include "fixed_point.h"
 #include "pin_config.h"
+#include "twiddle_factors.h"
 
 #include "driver/gpio.h"
 #include "driver/i2s_common.h"
@@ -23,10 +25,9 @@
 
 #define AUDIO_SAMPLE_RATE 44100
 #define SERIAL_BAUD_RATE 115200
-#define AUDIO_BUFF_SIZE 1024
 #define REBOOT_WAIT 5000
 #define CAPTURE_LENGTH 20
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 static i2s_chan_handle_t rx_chan; // I2S rx channel handler
 
@@ -101,29 +102,42 @@ void app_main(void) {
 
   ESP_ERROR_CHECK(i2s_channel_enable(rx_chan));
 
-  int32_t *buf = heap_caps_malloc(
-      AUDIO_BUFF_SIZE * sizeof(uint32_t),
+  fix32_10 *input_buf = heap_caps_malloc(
+      (1 << FFT_SIZE_BITS) * sizeof(fix32_10),
       MALLOC_CAP_DMA); // https://esp32.com/viewtopic.php?t=45663
-  size_t bytes_to_read = AUDIO_BUFF_SIZE * sizeof(uint32_t);
+
+  size_t bytes_to_read = (1 << FFT_SIZE_BITS) * sizeof(uint32_t);
   size_t bytes_read;
+
+  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
+  struct fix32_10_Complex *result_freqs = calloc((1 << FFT_SIZE_BITS), sizeof(struct fix32_10_Complex));
   // there's some on-time
   // to collect (duration) amount of samples, we take the number of seconds, multiply that by the sample rate, and then (for this mono channel) divide it by the buffer size
-  size_t capture_amount = CAPTURE_LENGTH * AUDIO_SAMPLE_RATE / AUDIO_BUFF_SIZE;
+  size_t capture_amount = CAPTURE_LENGTH * AUDIO_SAMPLE_RATE / (1 << FFT_SIZE_BITS);
   for (size_t i = 0; i < capture_amount; i++) {
-    esp_err_t ret = i2s_channel_read(rx_chan, buf, bytes_to_read, &bytes_read,
+    esp_err_t ret = i2s_channel_read(rx_chan, input_buf, bytes_to_read, &bytes_read,
                                      portMAX_DELAY);
     if (ret != ESP_OK || bytes_read != bytes_to_read) {
       printf("Read failed or incomplete: got %d bytes\n", (int)bytes_read);
       continue;
     }
+    generate_result_freqs(&params, complex_twiddle, input_buf, result_freqs);
+    
 #if DEBUG_MODE
-    for (size_t j = 0; j < AUDIO_BUFF_SIZE; j++) {
-      printf("result: %ld\n", (int32_t)buf[j]);
+    for (size_t j = 0; j < (1 << FFT_SIZE_BITS); j++) {
+        printf("%ld\n", (int32_t)input_buf[j]);
+    }
+    fflush(stdout);
+    for (size_t j = 0; j < (1 << FFT_SIZE_BITS); j++) {
+	fix32_10 magnitude = fix32_10_to_int32(multiply_fix32_10(result_freqs[j].real, result_freqs[j].real)) + fix32_10_to_int32(multiply_fix32_10(result_freqs[j].imag, result_freqs[j].imag));
+
+        printf("%ld\n", fix32_10_to_int32(magnitude));
     }
     fflush(stdout);
 #endif
   }
-  free(buf);
+  free(input_buf);
+  free(result_freqs);
 
   // reboot
   vTaskDelay(pdMS_TO_TICKS(REBOOT_WAIT));
