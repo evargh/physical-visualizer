@@ -37,9 +37,9 @@ void fractional_fix32_10(fix32_10 a, char string[FRACTIONAL_BITS+1]) {
 // carry functions regardless of the decimal
 fix32_10 add_fix32_10(fix32_10 a, fix32_10 b) { 
 	int64_t sum = (int64_t)a + (int64_t)b;
-	if(!(sum < (1 << 31) - 1 && sum > -(1 << 31))) {
+	if(!(sum < INT32_MAX && sum > INT32_MIN)) {
 		printf("sum failure, %ld %ld\n", (int32_t)a, (int32_t)b);
-		assert(sum < (1 << 31) - 1 && sum > -(1 << 31));
+		assert(sum < INT32_MAX && sum > INT32_MIN);
 	}
 	return (int32_t)sum; 
 }
@@ -47,9 +47,9 @@ fix32_10 add_fix32_10(fix32_10 a, fix32_10 b) {
 // carry functions regardless of the decimal
 fix32_10 subtract_fix32_10(fix32_10 a, fix32_10 b) {
 	int64_t sum = (int64_t)a - (int64_t)b;
-	if(!(sum < (1 << 31) - 1 && sum > -(1 << 31))) {
+	if(!(sum < INT32_MAX && sum > INT32_MIN)) {
 		printf("subtraction failure, %ld %ld\n", (int32_t)a, (int32_t)b);
-		assert(sum < (1 << 31) - 1 && sum > -(1 << 31));
+		assert(sum < INT32_MAX && sum > INT32_MIN);
 	}
 	return (int32_t)sum; 
 }

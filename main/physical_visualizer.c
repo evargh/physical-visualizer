@@ -13,6 +13,7 @@
 #include "driver/i2s_common.h"
 #include "driver/i2s_std.h"
 #include "driver/uart.h"
+#include "driver/uart_vfs.h"
 #include "esp_err.h"
 #include "esp_system.h"
 #include "esp_vfs_dev.h"
@@ -92,7 +93,7 @@ void init_uart1(void) {
   ESP_ERROR_CHECK(uart_param_config(uart_num, &uart_config));
   ESP_ERROR_CHECK(uart_set_pin(uart_num, UART1_TX, UART1_RX, -1, -1));
 
-  esp_vfs_dev_uart_use_driver(uart_num);
+  uart_vfs_dev_use_driver(uart_num);
 }
 
 void app_main(void) {

@@ -4,100 +4,7 @@
 #include "unity.h" // Include the Unity test framework header
 #include <stdint.h>
 
-TEST_CASE("reverse_bits_2", "[fft]") {
-#undef FFT_SIZE_BITS
-#define FFT_SIZE_BITS 2
-
-  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
-
-  uint32_t input[1 << FFT_SIZE_BITS] = {0, 1, 2, 3};
-  uint32_t correct[1 << FFT_SIZE_BITS] = {0, 2, 1, 3};
-
-  int64_t start_time = esp_timer_get_time();
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    input[i] = reverse_bits(&params, input[i]);
-  }
-  int64_t end_time = esp_timer_get_time();
-  printf("%lld\n", end_time - start_time);
-
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
-  }
-#undef FFT_SIZE_BITS
-}
-
-TEST_CASE("reverse_bits_3", "[fft]") {
-#undef FFT_SIZE_BITS
-#define FFT_SIZE_BITS 3
-
-  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
-
-  uint32_t input[1 << FFT_SIZE_BITS] = {0, 1, 2, 3, 4, 5, 6, 7};
-  uint32_t correct[1 << FFT_SIZE_BITS] = {0, 4, 2, 6, 1, 5, 3, 7};
-
-  int64_t start_time = esp_timer_get_time();
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    input[i] = reverse_bits(&params, input[i]);
-  }
-  int64_t end_time = esp_timer_get_time();
-  printf("%lld\n", end_time - start_time);
-
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
-  }
-#undef FFT_SIZE_BITS
-}
-
-TEST_CASE("reverse_bits_4", "[fft]") {
-#undef FFT_SIZE_BITS
-#define FFT_SIZE_BITS 4
-
-  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
-
-  uint32_t input[1 << FFT_SIZE_BITS] = {0, 1, 2,  3,  4,  5,  6,  7,
-                                        8, 9, 10, 11, 12, 13, 14, 15};
-  uint32_t correct[1 << FFT_SIZE_BITS] = {0, 8, 4, 12, 2, 10, 6, 14,
-                                          1, 9, 5, 13, 3, 11, 7, 15};
-
-  int64_t start_time = esp_timer_get_time();
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    input[i] = reverse_bits(&params, input[i]);
-  }
-  int64_t end_time = esp_timer_get_time();
-  printf("%lld\n", end_time - start_time);
-
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
-  }
-#undef FFT_SIZE_BITS
-}
-
-TEST_CASE("reverse_bits_5", "[fft]") {
-#undef FFT_SIZE_BITS
-#define FFT_SIZE_BITS 5
-
-  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
-
-  uint32_t input[1 << FFT_SIZE_BITS] = {
-      0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
-      16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
-  uint32_t correct[1 << FFT_SIZE_BITS] = {
-      0, 16, 8, 24, 4, 20, 12, 28, 2, 18, 10, 26, 6, 22, 14, 30,
-      1, 17, 9, 25, 5, 21, 13, 29, 3, 19, 11, 27, 7, 23, 15, 31};
-
-  int64_t start_time = esp_timer_get_time();
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    input[i] = reverse_bits(&params, input[i]);
-  }
-  int64_t end_time = esp_timer_get_time();
-  printf("%lld\n", end_time - start_time);
-
-  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
-    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
-  }
-#undef FFT_SIZE_BITS
-}
-
+// Tests whether a constant signal produces a line spectrum at 0 frequency
 void run_delta_test(int fft_size_bits, const struct fix32_10_Complex *twiddles,
                     int tolerance) {
   struct FFT_Params params = {.fft_size_bits = fft_size_bits};
@@ -125,6 +32,7 @@ void run_delta_test(int fft_size_bits, const struct fix32_10_Complex *twiddles,
   free(result_freqs);
 }
 
+// Performs the FFT on a sinusoid
 void run_sine_test(int fft_size_bits, const struct fix32_10_Complex *twiddles,
                    const fix32_10 *test_signal, int tolerance) {
   struct FFT_Params params = {.fft_size_bits = fft_size_bits};
@@ -137,7 +45,7 @@ void run_sine_test(int fft_size_bits, const struct fix32_10_Complex *twiddles,
   generate_result_freqs(&params, twiddles, test_signal, result_freqs);
   int64_t end_time = esp_timer_get_time();
 
-  printf("delta_test_%d us: %lld\n", fft_size_bits, end_time - start_time);
+  printf("sine_test_%d us: %lld\n", fft_size_bits, end_time - start_time);
 
   if (fft_size < 32) {
     for (size_t i = 0; i < fft_size; i++) {
@@ -149,6 +57,100 @@ void run_sine_test(int fft_size_bits, const struct fix32_10_Complex *twiddles,
     }
   }
   free(result_freqs);
+}
+
+TEST_CASE("reverse_bits_2", "[fft]") {
+#undef FFT_SIZE_BITS
+#define FFT_SIZE_BITS 2
+
+  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
+
+  uint32_t input[1 << FFT_SIZE_BITS] = {0, 1, 2, 3};
+  uint32_t correct[1 << FFT_SIZE_BITS] = {0, 2, 1, 3};
+
+  int64_t start_time = esp_timer_get_time();
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    input[i] = reverse_bits(&params, input[i]);
+  }
+  int64_t end_time = esp_timer_get_time();
+  printf("reverse_bits_2 us: %lld\n", end_time - start_time);
+
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
+  }
+#undef FFT_SIZE_BITS
+}
+
+TEST_CASE("reverse_bits_3", "[fft]") {
+#undef FFT_SIZE_BITS
+#define FFT_SIZE_BITS 3
+
+  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
+
+  uint32_t input[1 << FFT_SIZE_BITS] = {0, 1, 2, 3, 4, 5, 6, 7};
+  uint32_t correct[1 << FFT_SIZE_BITS] = {0, 4, 2, 6, 1, 5, 3, 7};
+
+  int64_t start_time = esp_timer_get_time();
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    input[i] = reverse_bits(&params, input[i]);
+  }
+  int64_t end_time = esp_timer_get_time();
+  printf("reverse_bits_3 us: %lld\n", end_time - start_time);
+
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
+  }
+#undef FFT_SIZE_BITS
+}
+
+TEST_CASE("reverse_bits_4", "[fft]") {
+#undef FFT_SIZE_BITS
+#define FFT_SIZE_BITS 4
+
+  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
+
+  uint32_t input[1 << FFT_SIZE_BITS] = {0, 1, 2,  3,  4,  5,  6,  7,
+                                        8, 9, 10, 11, 12, 13, 14, 15};
+  uint32_t correct[1 << FFT_SIZE_BITS] = {0, 8, 4, 12, 2, 10, 6, 14,
+                                          1, 9, 5, 13, 3, 11, 7, 15};
+
+  int64_t start_time = esp_timer_get_time();
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    input[i] = reverse_bits(&params, input[i]);
+  }
+  int64_t end_time = esp_timer_get_time();
+  printf("reverse_bits_4 us: %lld\n", end_time - start_time);
+
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
+  }
+#undef FFT_SIZE_BITS
+}
+
+TEST_CASE("reverse_bits_5", "[fft]") {
+#undef FFT_SIZE_BITS
+#define FFT_SIZE_BITS 5
+
+  struct FFT_Params params = {.fft_size_bits = FFT_SIZE_BITS};
+
+  uint32_t input[1 << FFT_SIZE_BITS] = {
+      0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+      16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+  uint32_t correct[1 << FFT_SIZE_BITS] = {
+      0, 16, 8, 24, 4, 20, 12, 28, 2, 18, 10, 26, 6, 22, 14, 30,
+      1, 17, 9, 25, 5, 21, 13, 29, 3, 19, 11, 27, 7, 23, 15, 31};
+
+  int64_t start_time = esp_timer_get_time();
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    input[i] = reverse_bits(&params, input[i]);
+  }
+  int64_t end_time = esp_timer_get_time();
+  printf("reverse_bits_5 us: %lld\n", end_time - start_time);
+
+  for (size_t i = 0; i < 1 << FFT_SIZE_BITS; i++) {
+    TEST_ASSERT_EQUAL_INT(correct[i], input[i]);
+  }
+#undef FFT_SIZE_BITS
 }
 
 TEST_CASE("delta_test_2", "[fft]") {
@@ -458,6 +460,8 @@ TEST_CASE("delta_test_10", "[fft]") {
 #undef FFT_SIZE_BITS
 }
 
+//TODO: In retrospect not well-structured at all. Obviously with such a small window there will be significant frequency smearing of the line spectra with a very wide sinc on periodic extension.
+// Now that I have the time, I plan to restructure these tests to be both low-memory and have some measurable results.
 TEST_CASE("440hz_sine_2", "[fft]") {
 #undef FFT_SIZE_BITS
 #define FFT_SIZE_BITS 2
