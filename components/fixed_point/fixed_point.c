@@ -15,8 +15,8 @@ int32_t fix32_10_to_int32(fix32_10 a) {
   // if a was negative, the FRACTIONAL_BITS MSBs should be 1s
   if (a < 0) {
     return (
-	(a >> FRACTIONAL_BITS) | (((1 << FRACTIONAL_BITS) - 1) << (32 - FRACTIONAL_BITS))
-	);
+	  ((a * -1) >> FRACTIONAL_BITS) * -1
+  );
   } else {
     return a >> FRACTIONAL_BITS;
   }
@@ -60,8 +60,14 @@ fix32_10 subtract_fix32_10(fix32_10 a, fix32_10 b) {
 fix32_10 multiply_fix32_10(fix32_10 a, fix32_10 b) {
   int64_t resized_a = (int64_t)(a); // 64 bit
   int64_t resized_b = (int64_t)(b); // 64 bit
-
-  int64_t product = (resized_a * resized_b) >> FRACTIONAL_BITS;
+  
+  int64_t product = (resized_a * resized_b);
+  if(product < 0) {
+    product = ((product * -1) >> FRACTIONAL_BITS) * -1;
+  }
+  else {
+    product = product >> FRACTIONAL_BITS;
+  }
 
   if(!(product < INT32_MAX && product > INT32_MIN)) {
 	printf("multiplication failure, %ld %ld\n", (int32_t)a, (int32_t)b);

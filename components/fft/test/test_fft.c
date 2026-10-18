@@ -457,10 +457,15 @@ TEST_CASE("delta_test_10", "[fft]") {
 #undef FFT_SIZE_BITS
 }
 
-//TODO: In retrospect not well-structured at all. Obviously with such a small window there will be significant frequency smearing of the line spectra with a very wide sinc on periodic extension.
-// Now that I have the time, I plan to restructure these tests to be both low-memory and have some measurable results.
+// TODO: In retrospect not well-structured at all. Obviously with such a small
+// window there will be significant frequency smearing of the line spectra with
+// a very wide sinc on periodic extension.
+//  Now that I have the time, I plan to restructure these tests to be both
+//  low-memory and have some measurable results.
 
-// The test sinusoids are generated at a linear frequency of 440Hz with a sampling frequency of 44.1 kHz, mapped to the necessary dynamic range and quantized afterwards.
+// The test sinusoids are generated at a linear frequency of 440Hz with a
+// sampling frequency of 44.1 kHz, mapped to the necessary dynamic range and
+// quantized afterwards.
 TEST_CASE("440hz_sine_2", "[fft]") {
 #undef FFT_SIZE_BITS
 #define FFT_SIZE_BITS 2
