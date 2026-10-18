@@ -29,5 +29,7 @@ fix32_10 multiply_fix32_10(fix32_10 a, fix32_10 b);
 struct fix32_10_Complex add_fix32_10_complex(struct fix32_10_Complex a, struct fix32_10_Complex b);
 struct fix32_10_Complex subtract_fix32_10_complex(struct fix32_10_Complex a, struct fix32_10_Complex b);
 struct fix32_10_Complex multiply_fix32_10_complex(struct fix32_10_Complex a, struct fix32_10_Complex b);
+struct fix32_10_Complex get_fix32_10_complex_conjugate(struct fix32_10_Complex a);
+fix32_10 get_fix32_10_complex_square_magnitude(struct fix32_10_Complex a);
 
 #endif

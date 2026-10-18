@@ -49,11 +49,8 @@ void run_sine_test(int fft_size_bits, const struct fix32_10_Complex *twiddles,
 
   if (fft_size < 32) {
     for (size_t i = 0; i < fft_size; i++) {
-      printf("%d: mag %ld \n", i,
-             fix32_10_to_int32(multiply_fix32_10(result_freqs[i].real,
-                                                 result_freqs[i].real)) +
-                 fix32_10_to_int32(multiply_fix32_10(result_freqs[i].imag,
-                                                     result_freqs[i].imag)));
+      printf("%d: square mag %ld \n", i,
+             get_fix32_10_complex_square_magnitude(result_freqs[i]));
     }
   }
   free(result_freqs);
@@ -462,6 +459,8 @@ TEST_CASE("delta_test_10", "[fft]") {
 
 //TODO: In retrospect not well-structured at all. Obviously with such a small window there will be significant frequency smearing of the line spectra with a very wide sinc on periodic extension.
 // Now that I have the time, I plan to restructure these tests to be both low-memory and have some measurable results.
+
+// The test sinusoids are generated at a linear frequency of 440Hz with a sampling frequency of 44.1 kHz, mapped to the necessary dynamic range and quantized afterwards.
 TEST_CASE("440hz_sine_2", "[fft]") {
 #undef FFT_SIZE_BITS
 #define FFT_SIZE_BITS 2

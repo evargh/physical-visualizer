@@ -9,8 +9,8 @@ set(EXTRA_COMPONENT_DIRS "../components")
 # This can be overridden from CMake cache:
 # - when invoking CMake directly: cmake -D TEST_COMPONENTS="xxxxx" ..
 # - when using idf.py: idf.py -T xxxxx build
-set(TEST_COMPONENTS "fixed_point" CACHE STRING "List of components to test")
-
+set(TEST_COMPONENTS "fft;fixed_point" CACHE STRING "List of components to test")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 idf_build_set_property(MINIMAL_BUILD ON)
 project(test_suite)

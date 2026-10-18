@@ -298,3 +298,84 @@ TEST_CASE("Complex Multiplication: (2 + 3j) * (5 + 9j) = -17 + 33j", "[fixed_poi
     TEST_ASSERT_EQUAL_INT(result.real, int32_to_fix32_10(-17));
     TEST_ASSERT_EQUAL_INT(result.imag, int32_to_fix32_10(33));
 }
+
+TEST_CASE("Complex Conjugation: (0 + 0j) -> (0 + 0j)", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(0)};
+    struct fix32_10_Complex result = get_fix32_10_complex_conjugate(a);
+    TEST_ASSERT_EQUAL_INT(result.real, int32_to_fix32_10(0));
+    TEST_ASSERT_EQUAL_INT(result.imag, int32_to_fix32_10(0));
+}
+
+TEST_CASE("Complex Conjugation: (0 + 1j) -> (0 - 1j)", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(1)};
+    struct fix32_10_Complex result = get_fix32_10_complex_conjugate(a);
+    TEST_ASSERT_EQUAL_INT(result.real, int32_to_fix32_10(0));
+    TEST_ASSERT_EQUAL_INT(result.imag, int32_to_fix32_10(-1));
+}
+
+TEST_CASE("Complex Conjugation: (0 - 1j) -> (0 + 1j)", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(-1)};
+    struct fix32_10_Complex result = get_fix32_10_complex_conjugate(a);
+    TEST_ASSERT_EQUAL_INT(result.real, int32_to_fix32_10(0));
+    TEST_ASSERT_EQUAL_INT(result.imag, int32_to_fix32_10(1));
+}
+
+TEST_CASE("Complex Conjugation: (0 + 2097151j) -> (0 - 2097151j)", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(2097151)};
+    struct fix32_10_Complex result = get_fix32_10_complex_conjugate(a);
+    TEST_ASSERT_EQUAL_INT(result.real, int32_to_fix32_10(0));
+    TEST_ASSERT_EQUAL_INT(result.imag, int32_to_fix32_10(-2097151));
+}
+
+TEST_CASE("Complex Square Magnitude: |(0 + 0j)|^2 -> 0", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(0)};
+    fix32_10 result = get_fix32_10_complex_square_magnitude(a);
+    TEST_ASSERT_EQUAL_INT(result, int32_to_fix32_10(0));
+}
+
+TEST_CASE("Complex Square Magnitude: |(1 + 0j)|^2 -> 1", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(1), int32_to_fix32_10(0)};
+    fix32_10 result = get_fix32_10_complex_square_magnitude(a);
+    TEST_ASSERT_EQUAL_INT(result, int32_to_fix32_10(1));
+}
+
+TEST_CASE("Complex Square Magnitude: |(-1 + 0j)|^2 -> 1", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(-1), int32_to_fix32_10(0)};
+    fix32_10 result = get_fix32_10_complex_square_magnitude(a);
+    TEST_ASSERT_EQUAL_INT(result, int32_to_fix32_10(1));
+}
+
+TEST_CASE("Complex Square Magnitude: |(0 + 1j)|^2 -> 1", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(1)};
+    fix32_10 result = get_fix32_10_complex_square_magnitude(a);
+    TEST_ASSERT_EQUAL_INT(result, int32_to_fix32_10(1));
+}
+
+TEST_CASE("Complex Square Magnitude: |(0 - 1j)|^2 -> 1", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(-1)};
+    fix32_10 result = get_fix32_10_complex_square_magnitude(a);
+    TEST_ASSERT_EQUAL_INT(result, int32_to_fix32_10(1));
+}
+
+TEST_CASE("Complex Square Magnitude: |(0 - 1j)|^2 -> 1", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(0), int32_to_fix32_10(-1)};
+    fix32_10 result = get_fix32_10_complex_square_magnitude(a);
+    TEST_ASSERT_EQUAL_INT(result, int32_to_fix32_10(1));
+}
+
+TEST_CASE("Complex Square Magnitude: |(6 - 8j)|^2 -> 100", "[fixed_point]")
+{
+    struct fix32_10_Complex a = {int32_to_fix32_10(6), int32_to_fix32_10(-8)};
+    fix32_10 result = get_fix32_10_complex_square_magnitude(a);
+    TEST_ASSERT_EQUAL_INT(result, int32_to_fix32_10(100));
+}
